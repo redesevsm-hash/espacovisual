@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruris — Desenvolvimento de Territórios Rurais</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#1D9E75;--green-dark:#0F6E56;--green-light:#E1F5EE;--text:#1a1a1a;--muted:#666;--bg:#fff;--bg2:#f8f8f6;--border:#e5e5e0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);font-size:16px;line-height:1.6}
+.page{display:none}.page.active{display:block}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 5%}
+.logo{font-size:20px;font-weight:700;letter-spacing:3px;color:var(--text);cursor:pointer}
+.logo span{color:var(--green)}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{font-size:14px;color:var(--muted);text-decoration:none;cursor:pointer;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent}
+.nav-links a:hover,.nav-links a.active{color:var(--green);border-bottom-color:var(--green)}
+.nav-cta{background:var(--green);color:#fff;padding:8px 20px;border-radius:6px;font-size:14px;cursor:pointer;border:none;font-family:inherit;font-weight:600;transition:background .2s}
+.nav-cta:hover{background:var(--green-dark)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px}
+.mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1.5rem 5%;z-index:99}
+.mobile-menu.open{display:block}
+.mobile-menu a{display:block;padding:12px 0;border-bottom:1px solid var(--border);color:var(--text);text-decoration:none;font-size:15px;cursor:pointer}
+
+/* UTILS */
+section{padding:5rem 5%}
+.tag-label{font-size:12px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.sec-title{font-size:clamp(24px,3vw,36px);font-weight:700;margin-bottom:1rem}
+.sec-sub{font-size:16px;color:var(--muted);max-width:520px;margin-bottom:3rem;line-height:1.7}
+.btn-p{background:var(--green);color:#fff;padding:12px 26px;border-radius:8px;font-size:15px;text-decoration:none;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:background .2s,transform .1s;display:inline-block}
+.btn-p:hover{background:var(--green-dark);transform:translateY(-1px)}
+.btn-s{background:#fff;color:var(--text);padding:12px 26px;border-radius:8px;font-size:15px;font-weight:600;border:1.5px solid var(--border);cursor:pointer;font-family:inherit;transition:border-color .2s,transform .1s;display:inline-block}
+.btn-s:hover{border-color:var(--green);color:var(--green);transform:translateY(-1px)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.75rem;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--green);transform:translateY(-3px)}
+
+/* ===== HOME ===== */
+.hero{padding:7rem 5% 5rem;background:var(--bg2);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-100px;top:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(29,158,117,.07) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-block;background:var(--green-light);color:var(--green-dark);font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(32px,5vw,56px);font-weight:700;line-height:1.15;max-width:680px;margin-bottom:1.5rem}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{font-size:18px;color:var(--muted);max-width:560px;margin-bottom:2.5rem;line-height:1.7}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:4rem}
+.hero-logos{padding-top:2rem;border-top:1px solid var(--border)}
+.hero-logos p{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:1rem}
+.badges-row{display:flex;gap:10px;flex-wrap:wrap}
+.badge{background:#fff;border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--muted)}
+.stats-bar{background:var(--green);padding:3rem 5%;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:2rem}
+.stat{text-align:center}
+.stat-n{font-size:36px;font-weight:700;color:#fff}
+.stat-l{font-size:13px;color:rgba(255,255,255,.75);margin-top:4px}
+.home-services{background:#fff}
+.srv-icon{width:44px;height:44px;background:var(--green-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:1rem}
+.srv-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.stag{font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;color:var(--muted)}
+.home-why{background:var(--bg2)}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.why-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.why-num{font-size:32px;font-weight:700;color:var(--green);margin-bottom:8px}
+.why-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.why-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.home-cta{background:var(--green);padding:5rem 5%;text-align:center}
+.home-cta h2{font-size:32px;font-weight:700;color:#fff;margin-bottom:1rem}
+.home-cta p{font-size:17px;color:rgba(255,255,255,.8);max-width:500px;margin:0 auto 2rem}
+.home-cta .btn-s{background:transparent;border-color:rgba(255,255,255,.5);color:#fff}
+.home-cta .btn-s:hover{border-color:#fff}
+
+/* ===== SOBRE ===== */
+.sobre-hero{background:var(--bg2);padding:6rem 5% 4rem}
+.sobre-hero h1{font-size:clamp(28px,4vw,46px);font-weight:700;max-width:600px;margin-bottom:1rem}
+.sobre-hero p{font-size:18px;color:var(--muted);max-width:560px;line-height:1.7}
+.sobre-story{background:#fff}
+.story-block{display:grid;grid-template-columns:1fr 2fr;gap:3rem;margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--border)}
+.story-block:last-child{border:none;margin:0;padding:0}
+.story-year{font-size:36px;font-weight:700;color:var(--green)}
+.story-block p{font-size:15px;color:var(--muted);line-height:1.8}
+.story-block h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.sobre-team{background:var(--bg2)}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.team-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.team-avatar{height:100px;display:flex;align-items:center;justify-content:center;font-size:36px}
+.av1{background:#E1F5EE}.av2{background:#E6F1FB}.av3{background:#FAEEDA}.av4{background:#FBEAF0}
+.team-info{padding:1.25rem}
+.team-info h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.team-info p{font-size:13px;color:var(--muted)}
+.sobre-valores{background:#fff}
+.valores-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.valor-card{border-left:3px solid var(--green);padding:1.25rem 1.5rem;background:var(--bg2);border-radius:0 8px 8px 0}
+.valor-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.valor-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.sobre-parceiros{background:var(--bg2)}
+.parc-grid{display:flex;flex-wrap:wrap;gap:12px}
+.parc-badge{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--muted)}
+
+/* ===== SERVIÇOS ===== */
+.srv-hero{background:var(--bg2);padding:6rem 5% 4rem}
+.srv-hero h1{font-size:clamp(28px,4vw,46px);font-weight:700;max-width:600px;margin-bottom:1rem}
+.srv-hero p{font-size:18px;color:var(--muted);max-width:560px;line-height:1.7}
+.srv-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem}
+.srv-detail-card{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.srv-detail-head{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.srv-big-icon{width:50px;height:50px;background:var(--green-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.srv-detail-head h3{font-size:17px;font-weight:700}
+.srv-detail-head p{font-size:13px;color:var(--muted);margin-top:2px}
+.srv-detail-body{padding:1.5rem}
+.srv-list{list-style:none}
+.srv-list li{padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);display:flex;align-items:flex-start;gap:8px}
+.srv-list li:last-child{border:none}
+.srv-list li::before{content:'→';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+.srv-abordagem{background:var(--bg2)}
+.abord-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.abord-step{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center}
+.abord-num{width:36px;height:36px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin:0 auto 12px}
+.abord-step h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.abord-step p{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* ===== PROJETOS ===== */
+.proj-hero{background:var(--bg2);padding:6rem 5% 4rem}
+.proj-hero h1{font-size:clamp(28px,4vw,46px);font-weight:700;max-width:600px;margin-bottom:1rem}
+.proj-hero p{font-size:18px;color:var(--muted);max-width:560px;line-height:1.7}
+.proj-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:2.5rem}
+.filter-btn{background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .2s}
+.filter-btn:hover,.filter-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.proj-card{border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s;cursor:pointer}
+.proj-card:hover{transform:translateY(-4px);border-color:var(--green)}
+.proj-thumb{height:160px;display:flex;align-items:center;justify-content:center;font-size:44px}
+.t-green{background:#E1F5EE}.t-blue{background:#E6F1FB}.t-amber{background:#FAEEDA}.t-pink{background:#FBEAF0}.t-teal{background:#E1F5EE}.t-purple{background:#EEEDFE}.t-coral{background:#FAECE7}
+.proj-body{padding:1.25rem}
+.proj-cat{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:8px}
+.proj-body h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.proj-body p{font-size:13px;color:var(--muted);line-height:1.6}
+.proj-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.proj-footer span{font-size:12px;color:var(--muted)}
+.proj-footer a{font-size:13px;color:var(--green);font-weight:600;text-decoration:none}
+.proj-hidden{display:none}
+
+/* ===== NOTÍCIAS ===== */
+.news-hero{background:var(--bg2);padding:6rem 5% 4rem}
+.news-hero h1{font-size:clamp(28px,4vw,46px);font-weight:700;max-width:600px;margin-bottom:1rem}
+.news-hero p{font-size:18px;color:var(--muted);max-width:560px;line-height:1.7}
+.news-section{background:#fff}
+.news-featured{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;margin-bottom:3rem}
+.news-big{border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.news-big:hover{border-color:var(--green)}
+.news-big-thumb{height:220px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:56px}
+.news-big-body{padding:1.5rem}
+.news-big-body .news-cat{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:8px}
+.news-big-body h2{font-size:20px;font-weight:700;margin-bottom:8px;line-height:1.3}
+.news-big-body p{font-size:14px;color:var(--muted);line-height:1.6}
+.news-big-body .news-date{font-size:12px;color:var(--muted);margin-top:12px}
+.news-side{display:flex;flex-direction:column;gap:16px}
+.news-small{border:1px solid var(--border);border-radius:10px;padding:1rem;display:flex;gap:12px;cursor:pointer;transition:border-color .2s}
+.news-small:hover{border-color:var(--green)}
+.news-small-thumb{width:60px;height:60px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.ns1{background:#E1F5EE}.ns2{background:#E6F1FB}.ns3{background:#FAEEDA}
+.news-small h3{font-size:14px;font-weight:700;margin-bottom:4px;line-height:1.3}
+.news-small p{font-size:12px;color:var(--muted)}
+.news-small .news-date{font-size:11px;color:var(--muted);margin-top:4px}
+.news-grid-title{font-size:20px;font-weight:700;margin-bottom:1.5rem}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.news-card{border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s}
+.news-card:hover{border-color:var(--green);transform:translateY(-3px)}
+.news-thumb{height:120px;display:flex;align-items:center;justify-content:center;font-size:36px}
+.news-body{padding:1.25rem}
+.news-body .news-cat{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:6px}
+.news-body h3{font-size:15px;font-weight:700;margin-bottom:6px;line-height:1.3}
+.news-body p{font-size:13px;color:var(--muted);line-height:1.6}
+.news-body .news-date{font-size:12px;color:var(--muted);margin-top:10px}
+.newsletter{background:var(--bg2);padding:4rem 5%;display:flex;gap:3rem;align-items:center;flex-wrap:wrap}
+.newsletter h3{font-size:22px;font-weight:700;margin-bottom:6px}
+.newsletter p{font-size:15px;color:var(--muted)}
+.newsletter-form{display:flex;gap:10px;flex:1;min-width:280px}
+.newsletter-form input{flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.newsletter-form input:focus{border-color:var(--green)}
+
+/* ===== CONTACTO ===== */
+.ct-hero{background:var(--bg2);padding:6rem 5% 4rem}
+.ct-hero h1{font-size:clamp(28px,4vw,46px);font-weight:700;max-width:600px;margin-bottom:1rem}
+.ct-hero p{font-size:18px;color:var(--muted);max-width:560px;line-height:1.7}
+.ct-section{background:#fff}
+.ct-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:start}
+.ct-form{display:flex;flex-direction:column;gap:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ct-form input,.ct-form textarea,.ct-form select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--text);transition:border-color .2s;outline:none}
+.ct-form input:focus,.ct-form textarea:focus,.ct-form select:focus{border-color:var(--green)}
+.ct-form textarea{min-height:130px;resize:vertical}
+.ct-form label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px;display:block}
+.ct-info{display:flex;flex-direction:column;gap:1.25rem}
+.info-item{display:flex;gap:14px;align-items:flex-start}
+.info-icon{width:42px;height:42px;background:var(--green-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.info-item h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px}
+.info-item p{font-size:14px;color:var(--text);line-height:1.6}
+.map-placeholder{margin-top:6px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.map-inner{background:var(--bg2);height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .2s;text-decoration:none}
+.map-inner:hover{background:#E1F5EE}
+.ct-horarios{background:var(--bg2);padding:4rem 5%}
+.hor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:2rem}
+.hor-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center}
+.hor-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.hor-card p{font-size:14px;color:var(--muted)}
+.hor-card .hor-time{font-size:18px;font-weight:700;color:var(--green);margin-top:8px}
+.ct-faq{background:#fff;padding:4rem 5%}
+.faq-list{max-width:700px;margin-top:2rem}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{padding:1rem 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;font-size:15px}
+.faq-q span{color:var(--green);font-size:20px;transition:transform .3s}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s;font-size:14px;color:var(--muted);line-height:1.7}
+.faq-a.open{max-height:200px;padding-bottom:1rem}
+.faq-q.open span{transform:rotate(45deg)}
+
+/* FOOTER */
+footer{background:var(--text);color:#fff;padding:3rem 5%}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2rem}
+.footer-brand .flogo{font-size:18px;font-weight:700;letter-spacing:3px;cursor:pointer}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,.45);margin-top:1rem;line-height:1.7;max-width:260px}
+.footer-col h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.4);margin-bottom:1rem}
+.footer-col a{display:block;font-size:14px;color:rgba(255,255,255,.65);text-decoration:none;margin-bottom:8px;cursor:pointer;transition:color .2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:1.5rem;display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.35);flex-wrap:wrap;gap:8px}
+.footer-social{display:flex;gap:10px;margin-top:1rem}
+.social-btn{width:34px;height:34px;border:1px solid rgba(255,255,255,.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:border-color .2s}
+.social-btn:hover{border-color:rgba(255,255,255,.6)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .grid-2,.about-grid,.srv-detail-grid,.ct-grid,.news-featured,.footer-inner{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none}
+  .hamburger{display:flex}
+  .form-row{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .footer-inner{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="go('home')">RU<span>R</span>IS</div>
+    <ul class="nav-links">
+      <li><a onclick="go('home')" id="nav-home">Início</a></li>
+      <li><a onclick="go('sobre')" id="nav-sobre">Sobre nós</a></li>
+      <li><a onclick="go('servicos')" id="nav-servicos">Serviços</a></li>
+      <li><a onclick="go('projetos')" id="nav-projetos">Projetos</a></li>
+      <li><a onclick="go('noticias')" id="nav-noticias">Notícias</a></li>
+      <li><a onclick="go('contacto')" id="nav-contacto">Contacto</a></li>
+    </ul>
+    <button class="nav-cta" onclick="go('contacto')">Falar connosco</button>
+    <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="go('home');toggleMenu()">Início</a>
+  <a onclick="go('sobre');toggleMenu()">Sobre nós</a>
+  <a onclick="go('servicos');toggleMenu()">Serviços</a>
+  <a onclick="go('projetos');toggleMenu()">Projetos</a>
+  <a onclick="go('noticias');toggleMenu()">Notícias</a>
+  <a onclick="go('contacto');toggleMenu()">Contacto</a>
+</div>
+
+<!-- ============================= HOME ============================= -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-badge">Desenvolvimento Rural · Desde 2014</div>
+    <h1>Estratégias para territórios com <em>futuro</em></h1>
+    <p>Apoiamos municípios, empresas e comunidades na valorização dos seus recursos endógenos — consultoria integrada, inovação e estratégia territorial.</p>
+    <div class="hero-btns">
+      <button class="btn-p" onclick="go('servicos')">Conhecer os serviços</button>
+      <button class="btn-s" onclick="go('projetos')">Ver projetos</button>
+    </div>
+    <div class="hero-logos">
+      <p>Áreas de atuação</p>
+      <div class="badges-row">
+        <span class="badge">Agroalimentar</span><span class="badge">Turismo</span><span class="badge">Empreendedorismo</span><span class="badge">Social</span><span class="badge">Cultura</span><span class="badge">Estratégia Territorial</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-n">10+</div><div class="stat-l">Anos de experiência</div></div>
+    <div class="stat"><div class="stat-n">22</div><div class="stat-l">Aldeias Smart Villages</div></div>
+    <div class="stat"><div class="stat-n">15</div><div class="stat-l">Municípios parceiros</div></div>
+    <div class="stat"><div class="stat-n">7</div><div class="stat-l">Municípios Verde Sentido</div></div>
+    <div class="stat"><div class="stat-n">50+</div><div class="stat-l">Operadores privados</div></div>
+  </div>
+
+  <section class="home-services">
+    <div class="tag-label">O que fazemos</div>
+    <div class="sec-title">Seis áreas de atuação</div>
+    <div class="sec-sub">Abordagem holística e adaptável. Cada projeto é único — entendemos os desafios do território para oferecer soluções à medida.</div>
+    <div class="grid-3">
+      <div class="card"><div class="srv-icon">🌾</div><h3 style="font-size:16px;font-weight:700;margin-bottom:8px">Agroalimentar</h3><p style="font-size:14px;color:var(--muted)">Valorização de produtos endógenos e cadeias curtas de comercialização.</p><div class="srv-tags"><span class="stag">Cadeias curtas</span><span class="stag">Sustentabilidade</span></div></div>
+      <div class="card"><div class="srv-icon">🗺️</div><h3 style="font-size:16px;font-weight:700;margin-bottom:8px">Estratégias Territoriais</h3><p style="font-size:14px;color:var(--muted)">Diagnóstico e planeamento estratégico para territórios de baixa densidade.</p><div class="srv-tags"><span class="stag">Smart Villages</span><span class="stag">Governação</span></div></div>
+      <div class="card"><div class="srv-icon">🚀</div><h3 style="font-size:16px;font-weight:700;margin-bottom:8px">Empreendedorismo</h3><p style="font-size:14px;color:var(--muted)">Incubadoras rurais, coworking e programas de capacitação empresarial.</p><div class="srv-tags"><span class="stag">Incubadoras</span><span class="stag">Inovação</span></div></div>
+      <div class="card"><div class="srv-icon">🏛️</div><h3 style="font-size:16px;font-weight:700;margin-bottom:8px">Turismo & Cultura</h3><p style="font-size:14px;color:var(--muted)">Promoção turística, circuitos e valorização do património natural e cultural.</p><div class="srv-tags"><span class="stag">Enoturismo</span><span class="stag">Património</span></div></div>
+      <div class="card"><div class="srv-icon">🤝</div><h3 style="font-size:16px;font-weight:700;margin-bottom:8px">Social</h3><p style="font-size:14px;color:var(--muted)">Parcerias de impacto e estratégias de inovação social para comunidades rurais.</p><div class="srv-tags"><span class="stag">Inovação Social</span><span class="stag">Avaliação</span></div></div>
+      <div class="card"><div class="srv-icon">📋</div><h3 style="font-size:16px;font-weight:700;margin-bottom:8px">Consultoria</h3><p style="font-size:14px;color:var(--muted)">Contratação pública, candidaturas a fundos europeus e formação especializada.</p><div class="srv-tags"><span class="stag">Fundos EU</span><span class="stag">Formação</span></div></div>
+    </div>
+  </section>
+
+  <section class="home-why">
+    <div class="tag-label">Porquê a Ruris</div>
+    <div class="sec-title">O que nos distingue</div>
+    <div class="why-grid">
+      <div class="why-card"><div class="why-num">01</div><h3>Abordagem holística</h3><p>Cada cliente é único. Desenhamos soluções à medida, compreendendo profundamente os desafios específicos de cada território.</p></div>
+      <div class="why-card"><div class="why-num">02</div><h3>Inovação contínua</h3><p>Mantemo-nos atualizados com as tendências emergentes e melhores práticas, garantindo abordagens eficientes e inovadoras.</p></div>
+      <div class="why-card"><div class="why-num">03</div><h3>Raízes locais</h3><p>Conhecemos o território. A nossa equipa tem experiência de campo e relações estabelecidas com os agentes locais.</p></div>
+      <div class="why-card"><div class="why-num">04</div><h3>Impacto real</h3><p>Projetos com resultados tangíveis: lucratividade melhorada, práticas sustentáveis e contribuições positivas para as comunidades.</p></div>
+    </div>
+  </section>
+
+  <section class="home-cta">
+    <h2>Pronto para desenvolver o seu território?</h2>
+    <p>Fale connosco e descubra como podemos trabalhar juntos para criar um futuro mais próspero e sustentável.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn-p" style="background:#fff;color:var(--green)" onclick="go('contacto')">Entrar em contacto</button>
+      <button class="btn-s" onclick="go('projetos')">Ver os nossos projetos</button>
+    </div>
+  </section>
+</div>
+
+<!-- ============================= SOBRE ============================= -->
+<div class="page" id="page-sobre">
+  <section class="sobre-hero">
+    <div class="tag-label">Quem somos</div>
+    <h1>Uma empresa com raízes no território</h1>
+    <p>Criada em 2014, a Ruris nasceu da convicção de que os territórios rurais têm potencial — e precisam de estratégia para o concretizar.</p>
+  </section>
+
+  <section class="sobre-story">
+    <div class="tag-label">A nossa história</div>
+    <div class="sec-title">Uma década de crescimento</div>
+    <div style="margin-top:2.5rem">
+      <div class="story-block">
+        <div><div class="story-year">2014</div></div>
+        <div><h3>Fundação</h3><p>A Ruris é fundada em Albergaria-a-Velha, com o objetivo de apoiar territórios rurais de baixa densidade na valorização dos seus recursos endógenos. Os primeiros projetos centram-se em estratégias agroalimentares e turismo rural.</p></div>
+      </div>
+      <div class="story-block">
+        <div><div class="story-year">2017</div></div>
+        <div><h3>Expansão territorial</h3><p>A Ruris alarga a sua área de atuação a nível nacional, estabelecendo parcerias com Comunidades Intermunicipais (CIM) e municípios de várias regiões. O empreendedorismo e a inovação social entram na carteira de serviços.</p></div>
+      </div>
+      <div class="story-block">
+        <div><div class="story-year">2020</div></div>
+        <div><h3>Smart Villages</h3><p>Início do projeto Smart Villages do Tâmega e Sousa — uma das maiores estratégias de desenvolvimento territorial integrado em Portugal, abrangendo 22 aldeias e vilas de 15 municípios.</p></div>
+      </div>
+      <div class="story-block">
+        <div><div class="story-year">2023</div></div>
+        <div><h3>Reconhecimento nacional</h3><p>A Ruris organiza a presença de 15 municípios da CIM Beiras e Serra da Estrela na BTL — Bolsa de Turismo de Lisboa, com uma campanha de reflorestação de impacto nacional. O roteiro Verde Sentido é lançado com 7 municípios e 50 operadores privados.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sobre-valores" style="background:var(--bg2)">
+    <div class="tag-label">Os nossos valores</div>
+    <div class="sec-title">O que nos guia</div>
+    <div class="sec-sub">A nossa forma de trabalhar é marcada por princípios sólidos que colocamos em prática em cada projeto.</div>
+    <div class="valores-grid">
+      <div class="valor-card"><h3>Territorialidade</h3><p>Cada território é único. Trabalhamos a partir das especificidades locais, não de soluções standardizadas.</p></div>
+      <div class="valor-card"><h3>Sustentabilidade</h3><p>Projetos que criam valor duradouro — económico, social e ambiental — para as gerações presentes e futuras.</p></div>
+      <div class="valor-card"><h3>Colaboração</h3><p>Acreditamos na força das parcerias. O desenvolvimento rural acontece quando os agentes locais trabalham juntos.</p></div>
+      <div class="valor-card"><h3>Inovação</h3><p>Procuramos constantemente abordagens novas e eficazes, adaptadas à realidade e ao contexto de cada projeto.</p></div>
+    </div>
+  </section>
+
+  <section class="sobre-parceiros">
+    <div class="tag-label">Parceiros & Entidades</div>
+    <div class="sec-title">Com quem trabalhamos</div>
+    <div class="sec-sub">Ao longo dos anos, estabelecemos relações de confiança com municípios, CIM, empresas e entidades públicas em todo o país.</div>
+    <div class="parc-grid">
+      <span class="parc-badge">CIM Tâmega e Sousa</span>
+      <span class="parc-badge">CIM Beiras e Serra da Estrela</span>
+      <span class="parc-badge">Município de Albergaria-a-Velha</span>
+      <span class="parc-badge">Município de Amarante</span>
+      <span class="parc-badge">Município de Baião</span>
+      <span class="parc-badge">Portugal Inovação Social</span>
+      <span class="parc-badge">Albergaria Empreende+</span>
+      <span class="parc-badge">BTL — Bolsa de Turismo de Lisboa</span>
+    </div>
+  </section>
+</div>
+
+<!-- ============================= SERVIÇOS ============================= -->
+<div class="page" id="page-servicos">
+  <section class="srv-hero">
+    <div class="tag-label">Serviços</div>
+    <h1>Soluções integradas para o desenvolvimento rural</h1>
+    <p>Abordagem adaptável e holística. Entendemos os desafios de cada território para oferecer soluções que criam impacto real.</p>
+  </section>
+
+  <section style="background:#fff;padding:4rem 5%">
+    <div class="srv-detail-grid">
+      <div class="srv-detail-card">
+        <div class="srv-detail-head"><div class="srv-big-icon">🌾</div><div><h3>Agroalimentar</h3><p>Valorização de recursos e cadeias curtas</p></div></div>
+        <div class="srv-detail-body"><ul class="srv-list">
+          <li>Valorização de fileiras e produtos endógenos</li>
+          <li>Programa piloto em sistemas alimentares sustentáveis</li>
+          <li>Estruturação de cadeias curtas de comercialização</li>
+          <li>Apoio a projetos de certificação e qualidade</li>
+          <li>Estratégias de capacitação para produtores locais</li>
+        </ul></div>
+      </div>
+      <div class="srv-detail-card">
+        <div class="srv-detail-head"><div class="srv-big-icon">🗺️</div><div><h3>Estratégias Territoriais</h3><p>Diagnóstico, planeamento e governação</p></div></div>
+        <div class="srv-detail-body"><ul class="srv-list">
+          <li>Diagnóstico e avaliação territorial integrada</li>
+          <li>Definição de matrizes estratégicas de desenvolvimento</li>
+          <li>Planos de ação e programas temáticos</li>
+          <li>Modelos de governação participativa</li>
+          <li>Estratégias Smart Villages</li>
+        </ul></div>
+      </div>
+      <div class="srv-detail-card">
+        <div class="srv-detail-head"><div class="srv-big-icon">🚀</div><div><h3>Empreendedorismo</h3><p>Ecossistemas de inovação rural</p></div></div>
+        <div class="srv-detail-body"><ul class="srv-list">
+          <li>Definição conceptual de incubadoras de base rural</li>
+          <li>Espaços de coworking e hubs criativos</li>
+          <li>Estratégias de educação e inovação social</li>
+          <li>Parcerias Portugal Inovação Social</li>
+          <li>Programas de mentoria e capacitação empresarial</li>
+        </ul></div>
+      </div>
+      <div class="srv-detail-card">
+        <div class="srv-detail-head"><div class="srv-big-icon">🏛️</div><div><h3>Turismo & Cultura</h3><p>Promoção e valorização do território</p></div></div>
+        <div class="srv-detail-body"><ul class="srv-list">
+          <li>Estratégias de promoção turística integrada</li>
+          <li>Circuitos turísticos de 1, 2 e 3 dias</li>
+          <li>Projetos criativos de valorização patrimonial</li>
+          <li>Organização de eventos e ações de ativação</li>
+          <li>Workshops, seminários e showcookings</li>
+        </ul></div>
+      </div>
+      <div class="srv-detail-card">
+        <div class="srv-detail-head"><div class="srv-big-icon">🤝</div><div><h3>Social</h3><p>Inovação e coesão social</p></div></div>
+        <div class="srv-detail-body"><ul class="srv-list">
+          <li>Estratégias de desenvolvimento social integrado</li>
+          <li>Diagnóstico e avaliação de organizações sociais</li>
+          <li>Parcerias para o Impacto — Portugal Inovação Social</li>
+          <li>Projetos de coesão territorial e inclusão</li>
+          <li>Auscultação da sociedade civil e participação pública</li>
+        </ul></div>
+      </div>
+      <div class="srv-detail-card">
+        <div class="srv-detail-head"><div class="srv-big-icon">📋</div><div><h3>Consultoria</h3><p>Apoio técnico e especializado</p></div></div>
+        <div class="srv-detail-body"><ul class="srv-list">
+          <li>Apoio na contratação pública</li>
+          <li>Candidaturas a fundos europeus (PT2030, FEADER)</li>
+          <li>Formação especializada para equipas técnicas</li>
+          <li>Elaboração de estudos e relatórios técnicos</li>
+          <li>Gestão e acompanhamento de projetos</li>
+        </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="srv-abordagem">
+    <div class="tag-label">Metodologia</div>
+    <div class="sec-title">A nossa abordagem</div>
+    <div class="sec-sub">Um processo estruturado que garante soluções adaptadas à realidade de cada cliente e território.</div>
+    <div class="abord-grid">
+      <div class="abord-step"><div class="abord-num">1</div><h3>Diagnóstico</h3><p>Análise profunda do território, das suas necessidades e potencialidades.</p></div>
+      <div class="abord-step"><div class="abord-num">2</div><h3>Estratégia</h3><p>Definição de objetivos, prioridades e plano de ação personalizado.</p></div>
+      <div class="abord-step"><div class="abord-num">3</div><h3>Implementação</h3><p>Execução acompanhada, com envolvimento dos agentes locais.</p></div>
+      <div class="abord-step"><div class="abord-num">4</div><h3>Avaliação</h3><p>Monitorização de resultados e ajuste contínuo da estratégia.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============================= PROJETOS ============================= -->
+<div class="page" id="page-projetos">
+  <section class="proj-hero">
+    <div class="tag-label">Portfólio</div>
+    <h1>Projetos que fazem a diferença</h1>
+    <p>Trabalhámos com municípios, CIM e entidades privadas em projetos de impacto real — do Douro ao Tâmega, das Beiras à Serra da Estrela.</p>
+  </section>
+
+  <section style="background:#fff;padding:4rem 5%">
+    <div class="proj-filters">
+      <button class="filter-btn active" onclick="filterProj('todos',this)">Todos</button>
+      <button class="filter-btn" onclick="filterProj('turismo',this)">Turismo</button>
+      <button class="filter-btn" onclick="filterProj('territorial',this)">Estratégias Territoriais</button>
+      <button class="filter-btn" onclick="filterProj('social',this)">Social</button>
+      <button class="filter-btn" onclick="filterProj('agroalimentar',this)">Agroalimentar</button>
+      <button class="filter-btn" onclick="filterProj('empreendedorismo',this)">Empreendedorismo</button>
+    </div>
+    <div class="proj-grid" id="projGrid">
+      <div class="proj-card" data-cat="turismo" onclick="go('projeto')"><div class="proj-thumb t-green">🍷</div><div class="proj-body"><div class="proj-cat">Turismo · Enoturismo</div><h3>Roteiro Verde Sentido</h3><p>Colaboração entre 7 municípios e 50 operadores para criar uma oferta enoturística integrada no Douro e Tâmega, com sessões de capacitação e cross-selling.</p></div><div class="proj-footer"><span>2023</span><a>Ver projeto →</a></div></div>
+      <div class="proj-card" data-cat="territorial"><div class="proj-thumb t-blue">🏘️</div><div class="proj-body"><div class="proj-cat">Estratégia Territorial</div><h3>Smart Villages Tâmega e Sousa</h3><p>Estratégia integrada para aumentar a atratividade de 22 aldeias para novos residentes, empreendedores e visitantes. Plano de ação com governação participativa.</p></div><div class="proj-footer"><span>2022–2023</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" data-cat="turismo"><div class="proj-thumb t-amber">🌲</div><div class="proj-body"><div class="proj-cat">Turismo · Sustentabilidade</div><h3>BTL'23 — CIM Beiras e Serra da Estrela</h3><p>Organização da presença de 15 municípios na BTL, com campanha de reflorestação e apadrinhamento de árvores pós-incêndios.</p></div><div class="proj-footer"><span>2023</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" data-cat="empreendedorismo"><div class="proj-thumb t-teal">🏗️</div><div class="proj-body"><div class="proj-cat">Empreendedorismo</div><h3>INOVCAST</h3><p>Projeto de inovação e acolhimento empresarial para apoiar o ecossistema empreendedor em territórios rurais de baixa densidade.</p></div><div class="proj-footer"><span>2023</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" data-cat="social"><div class="proj-thumb t-pink">🤝</div><div class="proj-body"><div class="proj-cat">Social · Inovação</div><h3>Parcerias para o Impacto</h3><p>Projetos no âmbito do Portugal Inovação Social com foco na coesão territorial e bem-estar das comunidades rurais.</p></div><div class="proj-footer"><span>2021–2023</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" data-cat="agroalimentar"><div class="proj-thumb t-purple">🍽️</div><div class="proj-body"><div class="proj-cat">Agroalimentar</div><h3>Sistemas Alimentares Sustentáveis</h3><p>Programa piloto para estruturar cadeias curtas de comercialização e valorizar produtos endógenos de regiões rurais portuguesas.</p></div><div class="proj-footer"><span>2022</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" data-cat="territorial"><div class="proj-thumb t-coral">🏔️</div><div class="proj-body"><div class="proj-cat">Estratégia Territorial</div><h3>Aldeias de Montanha — Serra da Estrela</h3><p>Desenvolvimento de estratégia de atratividade e valorização para aldeias de montanha na região da Serra da Estrela.</p></div><div class="proj-footer"><span>2022</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" data-cat="turismo"><div class="proj-thumb t-blue">🎪</div><div class="proj-body"><div class="proj-cat">Turismo · Cultura</div><h3>Circuitos Turísticos Regionais</h3><p>Estruturação de circuitos turísticos de 1 a 3 dias para vários municípios, com integração de operadores locais e agências de viagens.</p></div><div class="proj-footer"><span>2021–2022</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" data-cat="empreendedorismo"><div class="proj-thumb t-amber">💡</div><div class="proj-body"><div class="proj-cat">Empreendedorismo · Formação</div><h3>Capacitação de Agentes Locais</h3><p>Programa de workshops e formação especializada para agentes de desenvolvimento local em territórios rurais do Centro de Portugal.</p></div><div class="proj-footer"><span>2020–2021</span><a>Ver mais →</a></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============================= PROJETO DETALHE ============================= -->
+<div class="page" id="page-projeto">
+  <!-- Hero -->
+  <div style="background:var(--green);padding:5rem 5% 4rem;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-80px;top:-80px;width:400px;height:400px;background:rgba(255,255,255,.05);border-radius:50%"></div>
+    <div style="position:absolute;right:80px;bottom:-120px;width:300px;height:300px;background:rgba(255,255,255,.04);border-radius:50%"></div>
+    <div style="margin-bottom:1rem">
+      <span onclick="go('projetos')" style="font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;display:inline-flex;align-items:center;gap:6px">← Voltar aos projetos</span>
+    </div>
+    <div style="display:inline-block;background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:1.25rem">Turismo · Enoturismo</div>
+    <h1 style="font-size:clamp(28px,4vw,50px);font-weight:700;color:#fff;max-width:640px;line-height:1.2;margin-bottom:1rem">Roteiro Verde Sentido</h1>
+    <p style="font-size:17px;color:rgba(255,255,255,.8);max-width:560px;line-height:1.7;margin-bottom:2rem">Uma rota enoturística integrada que une 7 municípios, 50 operadores privados e os Vinhos Verdes do Douro e Tâmega numa experiência única.</p>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#fff">7</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">Municípios</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.2)"></div>
+      <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#fff">50+</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">Operadores privados</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.2)"></div>
+      <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#fff">2023</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">Ano de lançamento</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.2)"></div>
+      <div style="text-align:center"><div style="font-size:26px;font-weight:700;color:#fff">3</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">Dias de roteiro</div></div>
+    </div>
+  </div>
+
+  <!-- Thumbnail visual -->
+  <div style="height:280px;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:80px;border-bottom:1px solid var(--border)">🍷</div>
+
+  <!-- Corpo principal -->
+  <div style="padding:4rem 5%;display:grid;grid-template-columns:2fr 1fr;gap:4rem;align-items:start;background:#fff">
+    <!-- Conteúdo -->
+    <div>
+      <div style="margin-bottom:3rem">
+        <div class="tag-label">Contexto</div>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:1rem">O desafio</h2>
+        <p style="font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:1rem">Os municípios de Amarante, Baião, Cabeceiras de Basto, Celorico de Basto, Marco de Canaveses, Mondim de Basto e Resende partilhavam um recurso extraordinário — os Vinhos Verdes — mas apresentavam uma oferta turística fragmentada, sem articulação entre operadores e sem uma narrativa territorial comum.</p>
+        <p style="font-size:15px;color:var(--muted);line-height:1.8">A Ruris foi desafiada a criar uma estratégia que consolidasse este destino no segmento enoturístico e que respondesse às necessidades reais identificadas por agências de viagens e empresas de animação turística locais.</p>
+      </div>
+
+      <div style="margin-bottom:3rem">
+        <div class="tag-label">O que fizemos</div>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:1.5rem">Abordagem e metodologia</h2>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;gap:16px;align-items:flex-start">
+            <div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">1</div>
+            <div><h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Diagnóstico e auscultação</h3><p style="font-size:14px;color:var(--muted);line-height:1.6">Levantamento das necessidades dos operadores locais, agências de viagens e visitantes. Identificação dos ativos enoturísticos de cada município e das lacunas na oferta existente.</p></div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start">
+            <div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">2</div>
+            <div><h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Sessões de capacitação e cross-selling</h3><p style="font-size:14px;color:var(--muted);line-height:1.6">Workshops com os 50 operadores privados para desenvolver competências de venda conjunta, criação de pacotes e comunicação turística integrada.</p></div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start">
+            <div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">3</div>
+            <div><h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Estruturação do roteiro</h3><p style="font-size:14px;color:var(--muted);line-height:1.6">Criação do roteiro "Verde Sentido" com percursos de 1, 2 e 3 dias, integrando quintas, adegas, gastronomia local, paisagem e experiências culturais únicas.</p></div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start">
+            <div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">4</div>
+            <div><h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Lançamento e promoção</h3><p style="font-size:14px;color:var(--muted);line-height:1.6">Apresentação oficial do roteiro e consolidação do destino Douro e Tâmega no mercado enoturístico nacional e internacional.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:3rem">
+        <div class="tag-label">Resultados</div>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:1.25rem">Impacto alcançado</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="background:var(--green-light);border-radius:10px;padding:1.25rem"><div style="font-size:24px;font-weight:700;color:var(--green)">50+</div><div style="font-size:13px;color:var(--green-dark);margin-top:4px">Operadores integrados num produto turístico comum</div></div>
+          <div style="background:var(--green-light);border-radius:10px;padding:1.25rem"><div style="font-size:24px;font-weight:700;color:var(--green)">7</div><div style="font-size:13px;color:var(--green-dark);margin-top:4px">Municípios com oferta enoturística consolidada</div></div>
+          <div style="background:var(--green-light);border-radius:10px;padding:1.25rem"><div style="font-size:24px;font-weight:700;color:var(--green)">3</div><div style="font-size:13px;color:var(--green-dark);margin-top:4px">Roteiros estruturados de 1, 2 e 3 dias</div></div>
+          <div style="background:var(--green-light);border-radius:10px;padding:1.25rem"><div style="font-size:24px;font-weight:700;color:var(--green)">+35%</div><div style="font-size:13px;color:var(--green-dark);margin-top:4px">Aumento estimado na procura enoturística da região</div></div>
+        </div>
+      </div>
+
+      <!-- Depoimento -->
+      <div style="background:var(--bg2);border-left:3px solid var(--green);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin-bottom:3rem">
+        <p style="font-size:16px;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:1rem">"O projeto Verde Sentido transformou a forma como olhamos para o nosso território. Pela primeira vez, todos os municípios trabalham juntos com uma visão e uma voz comuns."</p>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">Responsável de Turismo</div>
+        <div style="font-size:12px;color:var(--muted)">CIM Tâmega e Sousa</div>
+      </div>
+
+      <!-- Municípios -->
+      <div>
+        <div class="tag-label">Território</div>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:1.25rem">Municípios envolvidos</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text)">Amarante</span>
+          <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text)">Baião</span>
+          <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text)">Cabeceiras de Basto</span>
+          <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text)">Celorico de Basto</span>
+          <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text)">Marco de Canaveses</span>
+          <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text)">Mondim de Basto</span>
+          <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text)">Resende</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div style="display:flex;flex-direction:column;gap:20px;position:sticky;top:80px">
+      <div style="background:var(--bg2);border-radius:12px;padding:1.5rem;border:1px solid var(--border)">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:1rem">Ficha do projeto</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Cliente</span><span style="font-weight:600;text-align:right;max-width:140px">CIM Tâmega e Sousa</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Área</span><span style="font-weight:600">Turismo</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Ano</span><span style="font-weight:600">2023</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Duração</span><span style="font-weight:600">8 meses</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">Região</span><span style="font-weight:600">Norte</span></div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border-radius:12px;padding:1.5rem;border:1px solid var(--border)">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:10px">Serviços utilizados</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>Estratégia turística</div>
+          <div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>Capacitação de operadores</div>
+          <div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>Estruturação de oferta</div>
+          <div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>Workshops e formação</div>
+          <div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>Promoção territorial</div>
+        </div>
+      </div>
+
+      <button class="btn-p" style="width:100%;text-align:center" onclick="go('contacto')">Projeto semelhante? Fale connosco</button>
+    </div>
+  </div>
+
+  <!-- Outros projetos -->
+  <section style="background:var(--bg2);padding:4rem 5%">
+    <div class="tag-label">Portfólio</div>
+    <div class="sec-title" style="margin-bottom:1.5rem">Outros projetos</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
+      <div class="proj-card" onclick="go('projetos')"><div class="proj-thumb t-blue">🏘️</div><div class="proj-body"><div class="proj-cat">Estratégia Territorial</div><h3>Smart Villages Tâmega e Sousa</h3><p>Estratégia integrada para 22 aldeias — residentes, empreendedores e visitantes.</p></div><div class="proj-footer"><span>2022–2023</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" onclick="go('projetos')"><div class="proj-thumb t-amber">🌲</div><div class="proj-body"><div class="proj-cat">Turismo · Sustentabilidade</div><h3>BTL'23 — CIM Beiras e Serra da Estrela</h3><p>15 municípios na BTL com campanha de reflorestação de impacto nacional.</p></div><div class="proj-footer"><span>2023</span><a>Ver mais →</a></div></div>
+      <div class="proj-card" onclick="go('projetos')"><div class="proj-thumb t-teal">🏗️</div><div class="proj-body"><div class="proj-cat">Empreendedorismo</div><h3>INOVCAST</h3><p>Inovação e acolhimento empresarial em territórios rurais de baixa densidade.</p></div><div class="proj-footer"><span>2023</span><a>Ver mais →</a></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============================= NOTÍCIAS ============================= -->
+<div class="page" id="page-noticias">
+  <section class="news-hero">
+    <div class="tag-label">Notícias & Eventos</div>
+    <h1>Mantemo-lo informado</h1>
+    <p>Acompanhe os nossos projetos, eventos e as últimas novidades sobre desenvolvimento rural em Portugal.</p>
+  </section>
+
+  <section class="news-section">
+    <div class="news-featured">
+      <div class="news-big">
+        <div class="news-big-thumb">🌿</div>
+        <div class="news-big-body">
+          <div class="news-cat">Destaque · Turismo</div>
+          <h2>Roteiro Verde Sentido distinguido como melhor projeto de enoturismo em Portugal</h2>
+          <p>A colaboração entre 7 municípios e 50 operadores privados do Douro e Tâmega foi reconhecida como um modelo de referência para o desenvolvimento do enoturismo em territórios rurais.</p>
+          <div class="news-date">15 de Março, 2024</div>
+        </div>
+      </div>
+      <div class="news-side">
+        <div class="news-small"><div class="news-small-thumb ns1">🏘️</div><div><h3>Smart Villages: 22 aldeias com novo plano de ação</h3><p>O modelo de governação do projeto é apresentado como caso de estudo.</p><div class="news-date">28 Fev, 2024</div></div></div>
+        <div class="news-small"><div class="news-small-thumb ns2">📋</div><div><h3>Ruris apoia candidaturas ao PT2030 no setor agroalimentar</h3><p>Novo serviço de apoio técnico a produtores e cooperativas locais.</p><div class="news-date">10 Fev, 2024</div></div></div>
+        <div class="news-small"><div class="news-small-thumb ns3">🎓</div><div><h3>Workshop: Fundos Europeus para o Desenvolvimento Rural</h3><p>Sessão de formação gratuita para agentes locais — inscrições abertas.</p><div class="news-date">2 Fev, 2024</div></div></div>
+      </div>
+    </div>
+
+    <div class="news-grid-title">Mais notícias</div>
+    <div class="news-grid">
+      <div class="news-card"><div class="news-thumb t-green">🌲</div><div class="news-body"><div class="news-cat">Sustentabilidade</div><h3>Campanha de reflorestação das Beiras ultrapassa meta de 10 000 árvores</h3><p>A iniciativa lançada na BTL'23 continua a crescer com o apoio das comunidades locais.</p><div class="news-date">20 Jan, 2024</div></div></div>
+      <div class="news-card"><div class="news-thumb t-blue">🏛️</div><div class="news-body"><div class="news-cat">Turismo · Cultura</div><h3>Novos circuitos turísticos lançados no Alto Minho para 2024</h3><p>Três novos roteiros de 2 dias integram gastronomia, paisagem e tradições locais.</p><div class="news-date">8 Jan, 2024</div></div></div>
+      <div class="news-card"><div class="news-thumb t-amber">🚀</div><div class="news-body"><div class="news-cat">Empreendedorismo</div><h3>Incubadora rural de Albergaria acolhe 5 novas startups</h3><p>O espaço Albergaria Empreende+ conta agora com 18 empresas instaladas.</p><div class="news-date">3 Jan, 2024</div></div></div>
+      <div class="news-card"><div class="news-thumb t-pink">🤝</div><div class="news-body"><div class="news-cat">Social</div><h3>Ruris distinguida no Prémio Portugal Inovação Social 2023</h3><p>O projeto de coesão territorial da CIM Tâmega e Sousa recebeu menção honrosa.</p><div class="news-date">18 Dez, 2023</div></div></div>
+      <div class="news-card"><div class="news-thumb t-teal">📊</div><div class="news-body"><div class="news-cat">Relatório</div><h3>Publicado relatório de impacto dos projetos Ruris 2023</h3><p>Mais de 30 projetos desenvolvidos, 15 municípios apoiados e impacto em 50+ operadores privados.</p><div class="news-date">21 Dez, 2023</div></div></div>
+      <div class="news-card"><div class="news-thumb t-purple">🎪</div><div class="news-body"><div class="news-cat">Evento</div><h3>Seminário Internacional sobre Desenvolvimento Rural — Fevereiro 2024</h3><p>Inscrições abertas para o encontro que reúne especialistas de Portugal e Espanha.</p><div class="news-date">15 Dez, 2023</div></div></div>
+    </div>
+  </section>
+
+  <div class="newsletter">
+    <div><h3>Subscreva a nossa newsletter</h3><p>Receba as últimas novidades sobre desenvolvimento rural e os nossos projetos.</p></div>
+    <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+      <input type="email" placeholder="O seu email" required>
+      <button type="submit" class="btn-p">Subscrever</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================= CONTACTO ============================= -->
+<div class="page" id="page-contacto">
+  <section class="ct-hero">
+    <div class="tag-label">Contacto</div>
+    <h1>Vamos trabalhar juntos</h1>
+    <p>Fale connosco e descubra como a Ruris pode ajudar a desenvolver o seu território. Respondemos em 24 horas.</p>
+  </section>
+
+  <section class="ct-section">
+    <div class="ct-grid">
+      <form class="ct-form" onsubmit="handleForm(event)">
+        <div class="form-row">
+          <div><label>Nome *</label><input type="text" placeholder="O seu nome" required></div>
+          <div><label>Email *</label><input type="email" placeholder="email@exemplo.pt" required></div>
+        </div>
+        <div class="form-row">
+          <div><label>Organização</label><input type="text" placeholder="Município / Empresa"></div>
+          <div><label>Telefone</label><input type="tel" placeholder="9xx xxx xxx"></div>
+        </div>
+        <div><label>Área de interesse</label>
+        <select>
+          <option value="" disabled selected>Selecione uma área</option>
+          <option>Agroalimentar</option>
+          <option>Estratégias Territoriais</option>
+          <option>Empreendedorismo</option>
+          <option>Turismo & Cultura</option>
+          <option>Social</option>
+          <option>Consultoria</option>
+          <option>Outro</option>
+        </select></div>
+        <div><label>Mensagem *</label><textarea placeholder="Descreva o seu projeto ou necessidade..." required></textarea></div>
+        <button type="submit" class="btn-p" id="submitBtn">Enviar mensagem</button>
+      </form>
+
+      <div class="ct-info">
+        <div class="info-item"><div class="info-icon">📍</div><div><h4>Morada</h4><p>Rua Américo Martins Pereira<br>Espaço Albergaria Empreende+<br>3850-837 Albergaria-a-Velha</p></div></div>
+        <div class="info-item"><div class="info-icon">✉️</div><div><h4>Email</h4><p>geral@ruris.pt</p></div></div>
+        <div class="info-item"><div class="info-icon">📞</div><div><h4>Telefone</h4><p>234 010 205</p></div></div>
+        <div class="info-item"><div class="info-icon">🕐</div><div><h4>Horário</h4><p>Segunda a Sexta · 9h00–18h00</p></div></div>
+        <div class="map-placeholder">
+          <a class="map-inner" href="https://maps.google.com/?q=Rua+Américo+Martins+Pereira,+Albergaria-a-Velha,+Portugal" target="_blank">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            <div style="text-align:center"><div style="font-size:14px;font-weight:600;color:var(--text)">Albergaria-a-Velha</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Ver no Google Maps →</div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ct-horarios">
+    <div class="tag-label">Disponibilidade</div>
+    <div class="sec-title">Como podemos ajudar</div>
+    <div class="hor-grid">
+      <div class="hor-card"><h3>Reunião presencial</h3><p>Venha visitar-nos em Albergaria-a-Velha ou deslocamo-nos ao seu município.</p><div class="hor-time">Por marcação</div></div>
+      <div class="hor-card"><h3>Videoconferência</h3><p>Reuniões online disponíveis para todo o território nacional e internacional.</p><div class="hor-time">Seg–Sex, 9h–18h</div></div>
+      <div class="hor-card"><h3>Resposta rápida</h3><p>Comprometemo-nos a responder a todos os contactos dentro de 24 horas úteis.</p><div class="hor-time">24h úteis</div></div>
+    </div>
+  </section>
+
+  <section class="ct-faq">
+    <div class="tag-label">FAQ</div>
+    <div class="sec-title">Perguntas frequentes</div>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Que tipo de clientes trabalha com a Ruris? <span>+</span></div><div class="faq-a">Trabalhamos com municípios, Comunidades Intermunicipais (CIM), empresas privadas, associações de desenvolvimento local, entidades sociais e qualquer organização que atue ou queira investir em territórios rurais.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Como se inicia um projeto com a Ruris? <span>+</span></div><div class="faq-a">O processo começa com uma reunião de diagnóstico — presencial ou por videoconferência — para entender as necessidades e objetivos do cliente. A partir daí, apresentamos uma proposta personalizada.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">A Ruris apoia na candidatura a fundos europeus? <span>+</span></div><div class="faq-a">Sim. Temos experiência em apoio técnico a candidaturas ao PT2030, FEADER, FEDER e outros instrumentos de financiamento europeu relevantes para o desenvolvimento rural.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">A Ruris atua apenas em Portugal? <span>+</span></div><div class="faq-a">Atualmente a nossa atuação é principalmente nacional, embora tenhamos já desenvolvido projetos com componentes de projeção internacional, nomeadamente no âmbito de redes europeias de desenvolvimento rural.</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="flogo" onclick="go('home')">RURIS</div>
+      <p>Estratégias integradas para o desenvolvimento de territórios rurais. Criando valor, riqueza e futuro desde 2014.</p>
+      <div class="footer-social">
+        <div class="social-btn">f</div>
+        <div class="social-btn">in</div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Páginas</h4>
+      <a onclick="go('home')">Início</a>
+      <a onclick="go('sobre')">Sobre nós</a>
+      <a onclick="go('servicos')">Serviços</a>
+      <a onclick="go('projetos')">Projetos</a>
+      <a onclick="go('noticias')">Notícias</a>
+      <a onclick="go('contacto')">Contacto</a>
+    </div>
+    <div class="footer-col">
+      <h4>Serviços</h4>
+      <a onclick="go('servicos')">Agroalimentar</a>
+      <a onclick="go('servicos')">Estratégias Territoriais</a>
+      <a onclick="go('servicos')">Empreendedorismo</a>
+      <a onclick="go('servicos')">Turismo & Cultura</a>
+      <a onclick="go('servicos')">Social</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contactos</h4>
+      <a>geral@ruris.pt</a>
+      <a>234 010 205</a>
+      <a>Albergaria-a-Velha</a>
+      <a onclick="go('contacto')">Enviar mensagem</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Ruris — Todos os direitos reservados</span>
+    <span>Política de Privacidade</span>
+  </div>
+</footer>
+
+<script>
+function go(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+pg).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  const nl=document.getElementById('nav-'+pg);
+  if(nl) nl.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleMenu(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function handleForm(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  btn.textContent='Mensagem enviada ✓';
+  btn.style.background='#0F6E56';
+  setTimeout(()=>{btn.textContent='Enviar mensagem';btn.style.background='';e.target.reset();},3000);
+}
+function handleNewsletter(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('button');
+  btn.textContent='Subscrito ✓';
+  btn.style.background='#0F6E56';
+  setTimeout(()=>{btn.textContent='Subscrever';btn.style.background='';e.target.reset();},3000);
+}
+function filterProj(cat,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.proj-card').forEach(c=>{
+    c.style.display=(cat==='todos'||c.dataset.cat===cat)?'block':'none';
+  });
+}
+function toggleFaq(el){
+  const ans=el.nextElementSibling;
+  const isOpen=ans.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(a=>a.classList.remove('open'));
+  document.querySelectorAll('.faq-q').forEach(q=>q.classList.remove('open'));
+  if(!isOpen){ans.classList.add('open');el.classList.add('open');}
+}
+go('home');
+</script>
+</body>
+</html>
